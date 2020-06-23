@@ -1,0 +1,87 @@
+# Create Factory
+127.0.0.1:8001/initFactory
+{
+	"url" : "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4"
+}
+{
+    "factory_id": 13,
+    "file_name": "file_example_MP4_480_1_5MG.mp4",
+    "file_size": 1570024,
+    "worker_id": 17
+}
+
+
+# Join Factory
+127.0.0.1:8001/joinFactory
+{
+	"factory_id" : 13
+}
+{
+    "factory_id": 13,
+    "url": "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4",
+    "worker_id": 18
+}
+
+Now, We have factory_id = 13
+and two workers with id , 17 and 18
+
+
+# Getting Work randomly for each worker
+
+127.0.0.1:8001/getWork
+
+{
+	"factory_id" : 13,
+	"worker_id" : 17
+}
+{
+  "isWork": 1,
+  "range_end": 524287,
+  "range_start": 0
+}
+
+{
+	"factory_id" : 13,
+	"worker_id" : 18
+}
+{
+  "isWork": 1,
+  "range_end": 1048575,
+  "range_start": 524288
+}
+
+{
+	"factory_id" : 13,
+	"worker_id" : 17
+}
+{
+  "isWork": 1,
+  "range_end": 1570023,
+  "range_start": 1048576
+}
+{
+	"factory_id" : 13,
+	"worker_id" : 17
+}
+{
+  "isWork": 0
+}
+
+#Submitting Work
+127.0.0.1:8001/submitWork
+
+{
+	"factory_id" : 13,
+	"work_id" : 1
+}
+
+{
+	"factory_id" : 13,
+	"work_id" : 0
+}
+
+{
+	"factory_id" : 13,
+	"work_id" : 2
+}
+
