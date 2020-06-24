@@ -30,6 +30,7 @@ def joinFactory(f_id):
     response = r.json()
     init_worker_dir(response)
     return response
+
 #------------------------------------------------------------------------------
 
 def update_work_file(worker_id, key, value):
@@ -60,6 +61,7 @@ def submit_work(factory_id, worker_id, work_id):
         'work_id' : work_id
     })
 
+#------------------------------------------------------------------------------
 
 def download(url, worker_id, work_id, start, end):
     bytes = end-start+1
@@ -82,13 +84,8 @@ def resume_download(worker_id):
         work_id = work['work_id']
         a = work['range_start']
         b = work['range_end']
-        print(f'{a} {b}')
         download(url, worker_id, work_id, a, b)
         submit_work(factory_id, worker_id, work_id)
         work = get_work(factory_id, worker_id)
 
-
-x = initFactory('https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4')
-# print(x['factory_id'])
-# x = joinFactory(18)
-resume_download(x['worker_id'])
+#------------------------------------------------------------------------------
