@@ -1,5 +1,5 @@
 import psycopg2
-import config
+import db_config as config
 
 
 class nxdb:
