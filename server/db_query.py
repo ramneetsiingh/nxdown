@@ -5,12 +5,12 @@ import math
 
 conn = db_init.nxdb.getConnection()
 
-def init_factory(url, file_size, work_size):
+def init_factory(url,file_name ,file_size ,work_size):
 
     cur = conn.cursor()
 
     # Insert row to factory table
-    cur.execute(f"insert into factory(url, file_size, work_size) values ('{url}', {file_size}, {work_size});")
+    cur.execute(f"insert into factory(url, file_name, file_size, work_size) values ('{url}', '{file_name}', {file_size}, {work_size});")
     cur.execute('SELECT LASTVAL()')
     factory_id = cur.fetchone()[0]
 
@@ -22,9 +22,7 @@ def init_factory(url, file_size, work_size):
     conn.commit()
     print('[DB NEW FACTORY] New factory inserted.')
 
-    return {
-        'factory_id' : factory_id
-    }
+    return join_factory(factory_id)
 
 
 def join_factory(factory_id):
@@ -35,10 +33,10 @@ def join_factory(factory_id):
     worker_id = cur.fetchone()[0]
     conn.commit()
     print('[DB JOIN FACTORY] worker inserted.')
-
-    return {
-        'worker_id' : worker_id
-    }
+    
+    res = get_factory_info(factory_id)
+    res['worker_id'] = worker_id
+    return res
 
 
 def assign_work(factory_id,worker_id):
@@ -78,35 +76,16 @@ def submit_work(factory_id,work_id):
     return 1
 
 
-def get_file_size(factory_id):
+def get_factory_info(factory_id):
     cur = conn.cursor()
-    cur.execute(f"select file_size from factory where factory_id = {factory_id}")
-    f_size = cur.fetchone()
-    if f_size is None:
-        return w_size
-    return f_size[0]
-
-
-def get_work_size(factory_id):
-    cur = conn.cursor()
-    cur.execute(f"select work_size from factory where factory_id = {factory_id}")
-    w_size = cur.fetchone()
-    if w_size is None:
-        return w_size
-    return w_size[0]
-
-def get_url(factory_id):
-    # Get url of factory
-    cur = conn.cursor()
-    cur.execute(f"select url from factory where factory_id = {factory_id}")
-    url = cur.fetchone()[0]
-    return url
-
-
-
-#Testing
-# print(init_factory('www.google.com',10,3))
-# print(join_factory(1))
-# print(assign_work(1,2))
-# print(submit_work(1,2))
-# print(get_work_size(2))
+    cur.execute(f"select factory_id, url, file_name, file_size, work_size from factory where factory_id = {factory_id}")
+    f_info = cur.fetchone()
+    if f_info is None:
+        return f_info
+    return {
+        'factory_id' : f_info[0],
+        'url' : f_info[1],
+        'file_name' : f_info[2],
+        'file_size' : f_info[3],
+        'work_size' : f_info[4],
+    }

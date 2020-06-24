@@ -1,15 +1,21 @@
 import requests
-import config as conf
-from utils import size_format
+import config
+import os
 
-file = input('Enter URL : ')
+appdata_dir = config.directory.get('APPDATA')
+mkdir(appdata_dir)
 
-initFactory = conf.getURL('initFactory')
+def mkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-r = requests.post(initFactory, json = {'url' : file}) 
-res = r.json()
 
-print ('Factory ID : ',res['factory_id'])
-print ('File Name : ',res['file_name'])
-f_size = size_format(res['file_size'])
-print ('File Size : ', f_size)
+def initFactory(url):
+    initFactory = config.getURL('initFactory')
+    r = requests.post(initFactory, json = {'url' : url}) 
+    res = r.json()
+    return res 
+
+def joinFactory(f_id):
+    r = requests.post(joinFactory, json = {'factory_id' : f_id}) 
+    res = r.json()

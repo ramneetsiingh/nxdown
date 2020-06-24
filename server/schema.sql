@@ -1,6 +1,7 @@
 CREATE TABLE factory (
     factory_id SERIAL,
     url VARCHAR(2048) NOT NULL,
+    file_name VARCHAR(50) NOT NULL,
     file_size  BIGINT NOT NULL,
     work_size INTEGER NOT NULL,
     PRIMARY KEY (factory_id)

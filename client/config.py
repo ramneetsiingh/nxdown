@@ -1,3 +1,4 @@
+import os
 
 server = '127.0.0.1:8001'
 
@@ -12,6 +13,6 @@ api = {
 def getURL(op):
     return 'http://' + server + api[op]
 
-download = {
-    'base_dir_name' : 'chunks'
+directory = {
+    'APPDATA' : '/home/' + os.environ['USER'] + '/.nxdown'
 }

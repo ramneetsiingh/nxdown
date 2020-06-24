@@ -41,10 +41,6 @@ def get_file_info(url):
     }
 
 def get_range(f_size, w_size, w_id):
-    #total_work = math.ceil(f_size/w_size)
     a = w_size*w_id
     b = min( w_size*(w_id+1)-1, f_size - 1 )
     return [a,b]
-
-#Testing
-# print(get_file_info('https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_5MG.mp3'))
