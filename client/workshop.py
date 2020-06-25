@@ -6,16 +6,14 @@ from . import utils
 appdata_dir = config.directory.get('APPDATA')
 utils.mkdir(appdata_dir)
 
-def worker_path(w_id):
-    return os.path.join(appdata_dir,str(w_id))
+worker_path = utils.worker_path     #Function def worker_path(f_id, w_id)
 
 #------------------------------------------------------------------------------
 
 def init_worker_dir(head):
-    worker_dir = worker_path(head['worker_id'])
+    worker_dir = worker_path(head['factory_id'], head['worker_id'])
     utils.mkdir(worker_dir)
     utils.write_pkl(head, os.path.join(worker_dir, "head"))
-    utils.write_pkl({'global_status' : 'pending'}, os.path.join(worker_dir, "work"))
 
 def initFactory(url):
     initFactory = config.getURL('initFactory')
@@ -33,8 +31,8 @@ def joinFactory(f_id):
 
 #------------------------------------------------------------------------------
 
-def update_work_file(worker_id, key, value):
-    workfile = os.path.join(worker_path(worker_id), "work")
+def update_work_file(factory_id, worker_id, key, value):
+    workfile = os.path.join(worker_path(factory_id, worker_id), "work")
     work = utils.read_pkl(workfile)
     work[key] = value
     utils.write_pkl(work, workfile)
@@ -47,14 +45,12 @@ def get_work(factory_id, worker_id):
     }).json()
 
     if work['isWork'] == 1:
-        update_work_file(worker_id, work['work_id'], "pending")
-    else:
-        update_work_file(worker_id, "global_status", "done")
+        update_work_file(factory_id, worker_id, work['work_id'], "pending")
 
     return work
 
 def submit_work(factory_id, worker_id, work_id):
-    update_work_file(worker_id, work_id, "done")
+    update_work_file(factory_id, worker_id, work_id, "done")
     submitWork = config.getURL('submitWork')
     work = requests.post(submitWork, json = {
         'factory_id' : factory_id,
@@ -63,18 +59,18 @@ def submit_work(factory_id, worker_id, work_id):
 
 #------------------------------------------------------------------------------
 
-def download(url, worker_id, work_id, start, end):
+def download(url, factory_id, worker_id, work_id, start, end):
     bytes = end-start+1
     chunk = {'Range': 'bytes={0}-{1}'.format(start, end)}
     print(f'Downloading Chunk {work_id} ({utils.size_format(bytes)})')
     r = requests.get(url, headers=chunk, stream=True) 
     
-    with open(os.path.join(worker_path(worker_id), str(work_id)), 'wb') as fp:
+    with open(os.path.join(worker_path(factory_id, worker_id), str(work_id)), 'wb') as fp:
         fp.write(r.content)
     print('Done')
 
-def resume_download(worker_id):
-    head = utils.read_pkl(os.path.join(worker_path(worker_id), "head"))
+def resume_download(factory_id, worker_id):
+    head = utils.read_pkl(os.path.join(worker_path(factory_id, worker_id), "head"))
     worker_id = head['worker_id']
     factory_id = head['factory_id']
     url = head['url']
@@ -84,7 +80,7 @@ def resume_download(worker_id):
         work_id = work['work_id']
         a = work['range_start']
         b = work['range_end']
-        download(url, worker_id, work_id, a, b)
+        download(url, factory_id, worker_id, work_id, a, b)
         submit_work(factory_id, worker_id, work_id)
         work = get_work(factory_id, worker_id)
 
