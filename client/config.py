@@ -15,7 +15,8 @@ def getURL(op):
     return 'http://' + server + api[op]
 
 directory = {
-    'APPDATA' : '/home/' + os.environ['USER'] + '/.nxdown'
+    'APPDATA' : '/home/' + os.environ['USER'] + '/.nxdown',
+    'DOWNLOAD' : '/home/' + os.environ['USER'] + '/Downloads'
 }
 
 

@@ -14,6 +14,7 @@ def init_worker_dir(head):
     worker_dir = worker_path(head['factory_id'], head['worker_id'])
     utils.mkdir(worker_dir)
     utils.write_pkl(head, os.path.join(worker_dir, "head"))
+    utils.write_pkl({}, os.path.join(worker_dir, "work"))
 
 def initFactory(url):
     initFactory = config.getURL('initFactory')
