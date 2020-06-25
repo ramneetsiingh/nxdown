@@ -6,7 +6,7 @@ if len(sys.argv) != 2 :
 
 from workspace import workshop
 
-download = workshop.joinFactory(argv[1])
+download = workshop.joinFactory(int(sys.argv[1]))
 print(f"[JOINED DOWNLOAD] UID:{download['factory_id']}")
 print('[STARTING DOWNLOAD]')
 workshop.resume_download(download['worker_id'])

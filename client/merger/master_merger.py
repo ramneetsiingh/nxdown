@@ -14,3 +14,4 @@ def discover_clients():
 
 
 def start():
+    pass

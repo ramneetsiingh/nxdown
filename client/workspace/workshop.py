@@ -1,7 +1,7 @@
 import requests
-import config
+from . import config
 import os
-import utils
+from . import utils
 
 appdata_dir = config.directory.get('APPDATA')
 utils.mkdir(appdata_dir)
