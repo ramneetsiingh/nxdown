@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 random.seed(datetime.now())
 
-# Workshop Configurations
+# Server Configurations
 server = '127.0.0.1:8001'
 
 api = {
@@ -16,6 +16,11 @@ api = {
 
 def getURL(op):
     return 'http://' + server + api[op]
+
+
+# Workshop Configurations
+from pathlib import Path
+home = str(Path.home())
 
 directory = {
     'APPDATA' : '/home/' + os.environ['USER'] + '/.nxdown',
