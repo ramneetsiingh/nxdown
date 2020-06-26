@@ -2,58 +2,97 @@ import config
 import socket
 import threading
 import re
+import utils
+import os
+import merge_master as mm
 
+fpath = ''   # Factory Directory. Assigned in start(f,w) function
+
+# TCP socket for receiving files
 MYIP = socket.gethostbyname(socket.gethostname())
-PORT = config.ports['MASTER_PORT']
+PORT = config.ports['SERVER_PORT']
 ADDR = (MYIP, PORT)
-FORMAT = 'utf-8'
-HEADER_SIZE = config.HEADER_SIZE
-
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+HEADER_SIZE = config.HEADER_SIZE
+SOCKCHUNK_SIZE = config.SOCKCHUNK_SIZE
 
-def receive_chunks(conn, addr, work_size):
-    print(f"[NEW CONNECTION] {addr} connected.")
+# Functions for communication between server and client 
+send = utils.send
+recv = utils.recv
 
-    worker_id= int( conn.recv(HEADER_SIZE).decode()[0:8] )
+def receive_chunks(conn, addr):
+    print(f'[NEW CONNECTION] {addr} connected')
 
+    # Receiving Header containing workerID
+    main_header= recv(conn, HEADER_SIZE, HEADER_SIZE)
+    worker_id = main_header.decode()[0:8].lstrip('0')
+    print(f'[WORKER INFO] worker ID : {worker_id}')
+    
+    # Creating directory to Save files
+    wdir = os.path.join(fpath, worker_id)
+    utils.mkdir(wdir)
+    
     while True:
-        chunk = conn.recv(HEADER_SIZE + work_size).decode()
-        if chunk == config.DISCONNECT_MSG:
-            print('[ALL CHUNKS RECEIVED] worker ID : {worker_id} ')
-            break
+        # Receiving header =>  FileName(8 bytes) FileSize(8 bytes) OR DISCONNECT Message
+        header = recv(conn, HEADER_SIZE, HEADER_SIZE).decode()
+        file_name = header[0:8].lstrip('0')
+        file_size = int(header[8:16])
 
-            print(f"[{addr}] {msg}")
-            conn.send("Msg received".encode(FORMAT))
+        # Checking for DISCONNECT MESSAGE
+        if file_name == config.DISCONNECT_MSG:
+            print(f'[ALL DATA RECEIVED] worker ID : {worker_id} ')
+            break
+        
+        # Receiving File
+        print(f'[RECEIVING DATA] File name : {file_name} ')
+        data = recv(conn, file_size, SOCKCHUNK_SIZE)
+        
+        # Saving file to worker directory
+        utils.save_data(data, wdir, file_name)
+        print(f'[DATA RECEIVED]')
 
     conn.close()
 
 
 def discover_clients(factory_id):
+    # Opening UDP socket
     UDPServer = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    # Discover Message Format => FactoryID (8 bytes) , IP (15 bytes) , PORT (5 bytes)
     DISCOVER_MSG = str(factory_id).rjust(8,'0') + str(MYIP).rjust(15,'0')  + str(PORT).rjust(5,'0')
-    dest_ip_prefix = re.sub('\d+$','',MYIP)
+    DISCOVER_MSG = DISCOVER_MSG.ljust(HEADER_SIZE,'0')
+
+    # Setting destination address
+    dest_ip_prefix = re.sub('\d+$','',MYIP)     # Example: If My IP is 192.168.1.4 , converts it to 192.168.1.
     dest_port = config.ports['CLIENT_PORT']
+
+    # Iteration over all possible IPs and sending Discover message
     for i in range(1,255):
         client_ip = dest_ip_prefix + str(i)
         client_addr = (client_ip,config.ports['CLIENT_PORT'])
         UDPServer.sendto(str.encode(DISCOVER_MSG), client_addr)
-    print('[DISCOVER] Message sent to LAN')
+
+    print('[DISCOVER] Broadcast on LAN')
 
 
-def start(factory_id, work_size):
+def start(factory_id):
+    global fpath
+    fpath = utils.factory_path(factory_id)
+
     server.listen()
-    print(f"[LISTENING] Server is listening on {ADDR}")
+    # print(f"[LISTENING] Server is listening on {ADDR}")
 
-    discover_thread = threading.Thread(target=discover_clients, args=[factory_id])
-    discover_thread.start()
+    discover_clients(factory_id)
     
     while True:
         conn, addr = server.accept()
-        thread = threading.Thread(target=receive_chunks, args=[conn, addr, work_size])
+        thread = threading.Thread(target=receive_chunks, args=[conn, addr])
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+        break
+    thread.join()
+    mm.merger(45)
 
-
-start(8293)
+start(45)

@@ -1,4 +1,5 @@
 import os
+import random
 
 # Workshop Configurations
 server = '127.0.0.1:8001'
@@ -22,10 +23,10 @@ directory = {
 
 # Merger Configurations
 ports = {
-    'CLIENT_PORT' : 9876 ,
-    'MASTER_PORT' : 9876
+    'CLIENT_PORT' : 12345,
+    'SERVER_PORT' : random.randrange(10000,15000)
 }
 
+SOCKCHUNK_SIZE = 1024*10
 HEADER_SIZE = 64
-DISCOVER_SIZE = 64
-DISCONNECT_MSG = "!DISCONNECT"
+DISCONNECT_MSG = "!DISCONN" # 8bytes

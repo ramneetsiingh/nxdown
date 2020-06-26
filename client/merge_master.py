@@ -1,5 +1,5 @@
-from . import config
-from . import utils
+import config
+import utils
 import os
 
 chunks = {}
