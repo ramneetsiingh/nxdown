@@ -32,7 +32,7 @@ def initFactory(url):
 
 def joinFactory(f_id):
     joinFactory = config.getURL('joinFactory')
-    r = requests.post(joinFactory, json = {'factory_id' : f_id}) 
+    r = requests.post(joinFactory, json = {'factory_id' : str(f_id)}) 
     response = r.json()
     init_worker_dir(response.copy())
     return response

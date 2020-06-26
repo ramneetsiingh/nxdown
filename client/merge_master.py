@@ -1,11 +1,11 @@
-import config
-import utils
+from . import config
+from . import utils
 import os
 
 # key: workID => value: Path of file with correnponding work_id
 chunks = {}
 
-def merger(factory_id):
+def start(factory_id):
     print('[MASTER MERGER] started')
     # Getting factory directory path
     fdir = utils.factory_path(factory_id)

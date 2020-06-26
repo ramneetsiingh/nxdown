@@ -1,5 +1,7 @@
 import os
 import random
+from datetime import datetime
+random.seed(datetime.now())
 
 # Workshop Configurations
 server = '127.0.0.1:8001'

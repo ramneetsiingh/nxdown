@@ -1,10 +1,10 @@
-import config
+from . import config
 import socket
 import threading
 import re
-import utils
+from . import utils
 import os
-import merge_master as mm
+import time
 
 fpath = ''   # Factory Directory. Assigned in start(f,w) function
 
@@ -71,12 +71,14 @@ def discover_clients(factory_id):
     dest_port = config.ports['CLIENT_PORT']
 
     # Iteration over all possible IPs and sending Discover message
-    for i in range(1,255):
-        client_ip = dest_ip_prefix + str(i)
-        client_addr = (client_ip,config.ports['CLIENT_PORT'])
-        UDPServer.sendto(str.encode(DISCOVER_MSG), client_addr)
+    while True:
+        for i in range(1,255):
+            client_ip = dest_ip_prefix + str(i)
+            client_addr = (client_ip,config.ports['CLIENT_PORT'])
+            UDPServer.sendto(str.encode(DISCOVER_MSG), client_addr)
+        print('[DISCOVER] Broadcast on LAN')
+        # time.sleep(10)
 
-    print('[DISCOVER] Broadcast on LAN')
 
 
 def start(factory_id):
@@ -86,7 +88,8 @@ def start(factory_id):
     server.listen()
     print(f"[LISTENING] Server is listening on {ADDR}")
 
-    discover_clients(factory_id)
+    discover_thread = threading.Thread(target=discover_clients, args=[factory_id])
+    discover_thread.start()
     
     while True:
         conn, addr = server.accept()

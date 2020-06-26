@@ -1,6 +1,6 @@
-import config
+from . import config
 import socket
-import utils
+from . import utils
 import os
 
 fpath = ''   # Factory Directory. Assigned in start(f,w) function
@@ -44,7 +44,6 @@ def send_chunks(server_addr):
 
         # List of path of each file in the worker directory
         datapath_list = [ os.path.join(wpath, data) for data in os.listdir(wpath) ]
-        print(datapath_list)
         #Iterating over each file
         for datapath in datapath_list:
             with open(datapath, 'rb') as f:
