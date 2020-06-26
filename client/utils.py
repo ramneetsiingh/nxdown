@@ -1,7 +1,6 @@
 import os
 import pickle
-# from . 
-import config
+from . import config
 import math
 
 def size_format(b):

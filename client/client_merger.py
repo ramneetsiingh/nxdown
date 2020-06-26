@@ -28,7 +28,7 @@ def make_header(*fields):
 def send_chunks(server_addr):
     '''Send Files of a factory to the Master worker'''
 
-    # List of paths of all workers beling to the factory
+    # List of paths of all workers belonging to the factory
     wpath_list = [ os.path.join(fpath, dir) for dir in os.listdir(fpath) if dir.isnumeric() ]
 
     # Iterating for each Worker
@@ -44,7 +44,7 @@ def send_chunks(server_addr):
 
         # List of path of each file in the worker directory
         datapath_list = [ os.path.join(wpath, data) for data in os.listdir(wpath) ]
-
+        print(datapath_list)
         #Iterating over each file
         for datapath in datapath_list:
             with open(datapath, 'rb') as f:
@@ -57,7 +57,7 @@ def send_chunks(server_addr):
                 data_header = make_header(file_name, file_size)
 
                 # Sending header and file
-                print(f'[SENDING DATA] File Name : {file_name[0:8].lstrip("0")} ')
+                print(f'[SENDING DATA] File Name : {file_name} ')
                 send(client, data_header, HEADER_SIZE)
                 send(client, data, SOCKCHUNK_SIZE)
                 print(f'[DATA SENT]')
@@ -112,5 +112,3 @@ def start(factory_id):
 
     print(f'[CONNECTING TO SERVER] address : {server_addr}')
     send_chunks(server_addr)
-
-start(45)

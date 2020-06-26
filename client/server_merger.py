@@ -38,6 +38,8 @@ def receive_chunks(conn, addr):
         # Receiving header =>  FileName(8 bytes) FileSize(8 bytes) OR DISCONNECT Message
         header = recv(conn, HEADER_SIZE, HEADER_SIZE).decode()
         file_name = header[0:8].lstrip('0')
+        if file_name == '':
+            file_name = '0'
         file_size = int(header[8:16])
 
         # Checking for DISCONNECT MESSAGE
@@ -82,7 +84,7 @@ def start(factory_id):
     fpath = utils.factory_path(factory_id)
 
     server.listen()
-    # print(f"[LISTENING] Server is listening on {ADDR}")
+    print(f"[LISTENING] Server is listening on {ADDR}")
 
     discover_clients(factory_id)
     
@@ -93,6 +95,3 @@ def start(factory_id):
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
         break
     thread.join()
-    mm.merger(45)
-
-start(45)

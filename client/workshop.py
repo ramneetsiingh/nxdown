@@ -11,23 +11,30 @@ worker_path = utils.worker_path     #Function def worker_path(f_id, w_id)
 #------------------------------------------------------------------------------
 
 def init_worker_dir(head):
+    factory_dir = utils.factory_path(head['factory_id'])
     worker_dir = worker_path(head['factory_id'], head['worker_id'])
     utils.mkdir(worker_dir)
-    utils.write_pkl(head, os.path.join(worker_dir, "head"))
+
+    worker_id = head['worker_id']
+    with open(os.path.join(worker_dir,'workerID'), 'wb') as f:
+        f.write(bytes(f'{worker_id}', 'utf-8'))
+
+    head.pop('worker_id')
+    utils.write_pkl(head, os.path.join(factory_dir, "head"))
     utils.write_pkl({}, os.path.join(worker_dir, "work"))
 
 def initFactory(url):
     initFactory = config.getURL('initFactory')
-    r = requests.post(initFactory, json = {'url' : url}) 
+    r = requests.post(initFactory, json = {'url' : url})
     response = r.json()
-    init_worker_dir(response)
+    init_worker_dir(response.copy())
     return response
 
 def joinFactory(f_id):
     joinFactory = config.getURL('joinFactory')
     r = requests.post(joinFactory, json = {'factory_id' : f_id}) 
     response = r.json()
-    init_worker_dir(response)
+    init_worker_dir(response.copy())
     return response
 
 #------------------------------------------------------------------------------
@@ -71,8 +78,12 @@ def download(url, factory_id, worker_id, work_id, start, end):
     print('Done')
 
 def resume_download(factory_id, worker_id):
-    head = utils.read_pkl(os.path.join(worker_path(factory_id, worker_id), "head"))
-    worker_id = head['worker_id']
+    f_path = utils.factory_path(factory_id)
+    w_path = worker_path(factory_id, worker_id)
+    head = utils.read_pkl(os.path.join(f_path, "head"))
+    
+    with open(os.path.join(w_path,'workerID'), 'rb') as f:
+        worker_id = f.read().decode('utf-8')
     factory_id = head['factory_id']
     url = head['url']
 
