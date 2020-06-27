@@ -7,7 +7,7 @@ choice = int(input('Press 1 for new download.\nPress 2 to join a download\n YOUR
 
 def download_complete():
     print('[DOWNLOAD COMPLETE]')
-    input('[MERGE PROCESS] starting')
+    input('[MERGE PROCESS] Press Enter.')
 
 fid = 59
 
