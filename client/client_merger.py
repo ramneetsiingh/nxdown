@@ -5,11 +5,6 @@ import os
 
 fpath = ''   # Factory Directory. Assigned in start(f,w) function
 
-# UPD discovery listening socket
-MYIP = socket.gethostbyname(socket.gethostname())
-PORT = config.ports['CLIENT_PORT']
-ADDR = (MYIP, PORT)
-
 HEADER_SIZE = config.HEADER_SIZE
 SOCKCHUNK_SIZE = config.SOCKCHUNK_SIZE
 
@@ -82,6 +77,11 @@ def decode_discover_message(msg):
 
 def get_discovered(factory_id):
     '''Reeceive Discover message and return Server Addr to send files'''
+
+    # UPD discovery listening socket
+    MYIP = socket.gethostbyname(socket.gethostname())
+    PORT = config.ports['CLIENT_PORT']
+    ADDR = (MYIP, PORT)
 
     print('[WAITING TO BE DISCOVERED]')
     msg = {'factory_id' : 0}
