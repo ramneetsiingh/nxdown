@@ -34,7 +34,7 @@ def get_file_info(url):
     '''
     res = requests.head(url)
     fsize = int(res.headers.get('content-length' , -1))
-    fname = res.url.split("/")[-1]
+    fname = res.url.split("/")[-1].split("=")[-1]
     return {
         'file_size' : fsize,
         'file_name' : fname
