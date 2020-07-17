@@ -66,18 +66,14 @@ def discover_clients(factory_id):
     DISCOVER_MSG = str(factory_id).rjust(8,'0') + str(MYIP).rjust(15,'0')  + str(PORT).rjust(5,'0')
     DISCOVER_MSG = DISCOVER_MSG.ljust(HEADER_SIZE,'0')
 
-    # Setting destination address
-    dest_ip_prefix = re.sub('\d+$','',MYIP)     # Example: If My IP is 192.168.1.4 , converts it to 192.168.1.
-    dest_port = config.ports['CLIENT_PORT']
+    # Setting Broadcast Option
+    UDPServer.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    # Iteration over all possible IPs and sending Discover message
+    # Broadcasting in 10 second intervals
     while True:
-        for i in range(1,255):
-            client_ip = dest_ip_prefix + str(i)
-            client_addr = (client_ip,config.ports['CLIENT_PORT'])
-            UDPServer.sendto(str.encode(DISCOVER_MSG), client_addr)
+        UDPServer.sendto(str.encode(DISCOVER_MSG), ('<broadcast>', config.ports['CLIENT_PORT']))
         print('[DISCOVER] Broadcast on LAN')
-        # time.sleep(10)
+        time.sleep(10)
 
 
 
